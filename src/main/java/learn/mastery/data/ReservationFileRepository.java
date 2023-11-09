@@ -31,8 +31,8 @@ public class ReservationFileRepository implements ReservationRepository {
 
             for (String line = reader.readLine(); line != null; line = reader.readLine()) {
 
-                String[] fields = line.split(",", -1);
-                System.out.println(fields.length);
+                String[] fields = line.split(DELIMITER, -1);
+
                 if (fields.length == 5) {
                     result.add(deserialize(fields));
                 }
