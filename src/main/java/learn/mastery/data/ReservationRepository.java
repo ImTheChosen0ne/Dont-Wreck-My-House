@@ -8,8 +8,8 @@ import java.util.List;
 public interface ReservationRepository {
 
     public List<Reservation> findByHost(Host host);
-    public Reservation add(Reservation reservation);
-    public boolean update(Reservation reservation);
-    public boolean deleteById(int reservationId);
+    public Reservation add(Host host, Reservation reservation) throws DataException;
+    public boolean update(Reservation reservation) throws DataException;
+    public boolean delete(Reservation reservation) throws DataException;
 
 }

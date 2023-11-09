@@ -15,6 +15,68 @@ public class Host {
     private BigDecimal standardRate;
     private BigDecimal weekendRate;
 
+    public Host(String id, String lastName, String email, String phone, String address, String city, String state, int zip, BigDecimal standardRate, BigDecimal weekendRate) {
+        this.id = id;
+        this.lastName = lastName;
+        this.email = email;
+        this.phone = phone;
+        this.address = address;
+        this.city = city;
+        this.state = state;
+        this.zip = zip;
+        this.standardRate = standardRate;
+        this.weekendRate = weekendRate;
+    }
+
+    public Host() {
+
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public void setZip(int zip) {
+        this.zip = zip;
+    }
+
+    public void setStandardRate(BigDecimal standardRate) {
+        this.standardRate = standardRate;
+    }
+
+    public void setWeekendRate(BigDecimal weekendRate) {
+        this.weekendRate = weekendRate;
+    }
+
     public String getId() {
         return id;
     }
