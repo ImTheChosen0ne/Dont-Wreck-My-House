@@ -9,7 +9,7 @@ public interface ReservationRepository {
 
     public List<Reservation> findByHost(Host host);
     public Reservation add(Host host, Reservation reservation) throws DataException;
-    public boolean update(Reservation reservation) throws DataException;
-    public boolean delete(Reservation reservation) throws DataException;
+    public boolean update(Host host, Reservation reservation) throws DataException;
+    public boolean delete(Host host, Reservation reservation) throws DataException;
 
 }

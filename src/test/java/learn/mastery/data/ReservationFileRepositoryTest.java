@@ -51,5 +51,28 @@ class ReservationFileRepositoryTest {
         assertEquals(2, reservation.getId());
     }
 
+    @Test
+    void shouldUpdate() throws DataException {
+        Reservation reservation = new Reservation();
+        reservation.setId(1);
+        reservation.setStart(LocalDate.of(2021,1,16));
+        reservation.setEnd(LocalDate.of(2022,1,23));
+        Guest guest = new Guest();
+        guest.setId(21);
+        reservation.setGuest(guest);
+        reservation.setTotal(new BigDecimal(100));
+
+        boolean success = repository.update(host, reservation);
+        assertTrue(success);
+    }
+
+    @Test
+    void shouldDelete() throws DataException {
+        Reservation reservation = new Reservation();
+        reservation.setId(1);
+
+        boolean actual = repository.delete(host, reservation);
+        assertTrue(actual);
+    }
 
 }

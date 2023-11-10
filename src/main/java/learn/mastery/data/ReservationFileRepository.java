@@ -24,6 +24,7 @@ public class ReservationFileRepository implements ReservationRepository {
     }
 
     public List<Reservation> findByHost(Host host) {
+
         ArrayList<Reservation> result = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(getFilePath(host).toFile()))) {
 
@@ -55,8 +56,9 @@ public class ReservationFileRepository implements ReservationRepository {
         return reservation;
     }
     @Override
-    public boolean update(Reservation reservation) throws DataException {
-        Reservation existingReservation = findById(findByHost(reservation.getHost()),reservation.getId());
+    public boolean update(Host host, Reservation reservation) throws DataException {
+        List<Reservation> hostReservations = findByHost(host);
+        Reservation existingReservation = findById(hostReservations,reservation.getId());
 
         if (existingReservation != null) {
             existingReservation.setStart(reservation.getStart());
@@ -64,18 +66,19 @@ public class ReservationFileRepository implements ReservationRepository {
             existingReservation.setGuest(reservation.getGuest());
             existingReservation.setTotal(reservation.getTotal());
 
-            appendToFile(getFilePath(reservation.getHost()), findByHost(reservation.getHost()));
+            appendToFile(getFilePath(host), hostReservations);
             return true;
         }
 
         return false;
     }
     @Override
-    public boolean delete(Reservation reservation) throws DataException {
-        Reservation existingReservation = findById(findByHost(reservation.getHost()), reservation.getId());
+    public boolean delete(Host host, Reservation reservation) throws DataException {
+        List<Reservation> hostReservations = findByHost(host);
+        Reservation existingReservation = findById(hostReservations, reservation.getId());
         if (existingReservation != null) {
-            findByHost(reservation.getHost()).remove(existingReservation);
-            appendToFile(getFilePath(reservation.getHost()), findByHost(reservation.getHost()));
+            hostReservations.remove(existingReservation);
+            appendToFile(getFilePath(host), hostReservations);
             return true;
         }
         return false;
