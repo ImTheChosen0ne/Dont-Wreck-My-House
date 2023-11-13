@@ -2,7 +2,9 @@ package learn.mastery.domain;
 
 import learn.mastery.data.HostRepository;
 import learn.mastery.models.Host;
+import org.springframework.stereotype.Service;
 
+@Service
 public class HostService {
     private HostRepository repository;
 
@@ -10,7 +12,7 @@ public class HostService {
         this.repository = repository;
     }
 
-    public Host getHostById(String hostId) {
-        return repository.getHostById(hostId);
+    public Host getHostByEmail(String hostEmail) {
+        return repository.getHostByEmail(hostEmail);
     }
 }

@@ -33,12 +33,12 @@ class HostFileRepositoryTest {
         assertEquals(1, actual.size());
     }
     @Test
-    void findHostById() {
-        Host host = repository.getHostById("3edda6bc-ab95-49a8-8962-d50b53f84b15");
+    void findHostByEmail() {
+        Host host = repository.getHostByEmail("eyearnes0@sfgate.com");
         assertNotNull(host);
         assertEquals("Yearnes", host.getLastName());
 
-        host = repository.getHostById("3sdfda6bc-as95-49a8-8962-d50b53s84b15");
+        host = repository.getHostByEmail("fake@fake.com");
         assertNull(host);
     }
 }

@@ -3,6 +3,8 @@ package learn.mastery.data;
 import learn.mastery.models.Guest;
 import learn.mastery.models.Host;
 import learn.mastery.models.Reservation;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.math.BigDecimal;
@@ -12,20 +14,21 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-
+@Repository
 public class ReservationFileRepository implements ReservationRepository {
 
     private static final String HEADER = "id,start_date,end_date,guest_id,total";
     private String directoryPath;
     private static final String DELIMITER = ",";
 
-    public ReservationFileRepository(String directoryPath) {
+    public ReservationFileRepository(@Value("./data/reservations") String directoryPath) {
         this.directoryPath = directoryPath;
     }
 
     public List<Reservation> findByHost(Host host) {
 
         ArrayList<Reservation> result = new ArrayList<>();
+
         try (BufferedReader reader = new BufferedReader(new FileReader(getFilePath(host).toFile()))) {
 
             reader.readLine(); // read header

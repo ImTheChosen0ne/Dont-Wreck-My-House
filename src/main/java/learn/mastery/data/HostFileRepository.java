@@ -1,6 +1,8 @@
 package learn.mastery.data;
 
 import learn.mastery.models.Host;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Repository;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -8,18 +10,18 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-
+@Repository
 public class HostFileRepository implements HostRepository{
     private String filePath;
 
-    public HostFileRepository(String filePath) {
+    public HostFileRepository(@Value("./data/hosts.csv")String filePath) {
         this.filePath = filePath;
     }
 
     @Override
-    public Host getHostById(String hostId) {
+    public Host getHostByEmail(String hostEmail) {
         return findAll().stream()
-                .filter(i -> i.getId().equalsIgnoreCase(hostId))
+                .filter(i -> i.getEmail().equalsIgnoreCase(hostEmail))
                 .findFirst()
                 .orElse(null);
     }

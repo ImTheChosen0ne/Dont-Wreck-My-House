@@ -2,6 +2,8 @@ package learn.mastery.data;
 
 import learn.mastery.models.Guest;
 import learn.mastery.models.Host;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Repository;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -9,11 +11,11 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-
+@Repository
 public class GuestFileRepository implements GuestRepository{
     private String filePath;
 
-    public GuestFileRepository(String filePath) {
+    public GuestFileRepository(@Value("./data/guests.csv")String filePath) {
         this.filePath = filePath;
     }
 
