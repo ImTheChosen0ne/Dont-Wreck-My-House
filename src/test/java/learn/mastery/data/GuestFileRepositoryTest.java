@@ -33,11 +33,11 @@ class GuestFileRepositoryTest {
     }
     @Test
     void findGuestById() {
-        Guest guest = repository.getGuestById(1);
+        Guest guest = repository.getGuestByEmail("slomas0@mediafire.com");
         assertNotNull(guest);
         assertEquals("Sullivan", guest.getFirstName());
 
-        guest = repository.getGuestById(5);
+        guest = repository.getGuestByEmail("fake@fake.com");
         assertNull(guest);
     }
 }

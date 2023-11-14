@@ -15,4 +15,8 @@ public class GuestService {
     public Guest getGuestById(int guestId) {
         return repository.getGuestById(guestId);
     }
+
+    public Guest getGuestByEmail(String guestEmail) {
+        return repository.getGuestByEmail(guestEmail);
+    }
 }

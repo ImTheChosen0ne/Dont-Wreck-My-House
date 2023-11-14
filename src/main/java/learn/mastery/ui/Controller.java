@@ -4,6 +4,8 @@ import learn.mastery.data.DataException;
 import learn.mastery.domain.GuestService;
 import learn.mastery.domain.HostService;
 import learn.mastery.domain.ReservationService;
+import learn.mastery.domain.Result;
+import learn.mastery.models.Guest;
 import learn.mastery.models.Host;
 import learn.mastery.models.Reservation;
 import org.springframework.stereotype.Component;
@@ -15,9 +17,7 @@ import java.util.List;
 public class Controller {
     private View view;
     private ReservationService reservationService;
-
     private HostService hostService;
-
     private GuestService guestService;
 
     public Controller(View view, ReservationService reservationService, HostService hostService, GuestService guestService) {
@@ -27,13 +27,13 @@ public class Controller {
         this.guestService = guestService;
     }
 
-    public void run() {
+    public void run() throws DataException {
         view.printHeader("Don't Wreck My House");
             runMenu();
         view.printHeader("Goodbye.");
     }
 
-    private void runMenu() {
+    private void runMenu() throws DataException {
         MainMenuOption option;
         do {
             option = view.selectMainMenuOption();
@@ -54,36 +54,90 @@ public class Controller {
         } while (option != MainMenuOption.EXIT);
     }
     private void viewByHost() {
-        view.printHeader("View Reservations for Host");
+        view.printHeader(MainMenuOption.VIEW_RESERVATIONS.getMessage());
         String hostEmail = view.getHostEmail();
         Host host = hostService.getHostByEmail(hostEmail);
         List<Reservation> reservations = reservationService.findByHost(host);
-        view.printReservations(host, reservations);
+        view.printReservations(host, reservations, guestService);
     }
 
-    private void addReservation() {
-//        view.displayHeader(MainMenuOption.ADD_FORAGE.getMessage());
-//        Forager forager = getForager();
-//        if (forager == null) {
-//            return;
-//        }
-//        Item item = getItem();
-//        if (item == null) {
-//            return;
-//        }
-//        Forage forage = view.makeForage(forager, item);
-//        Result<Forage> result = forageService.add(forage);
-//        if (!result.isSuccess()) {
-//            view.displayStatus(false, result.getErrorMessages());
-//        } else {
-//            String successMessage = String.format("Forage %s created.", result.getPayload().getId());
-//            view.displayStatus(true, successMessage);
-//        }
-    }
-    private void updateReservation() {
+    private void addReservation() throws DataException {
+        view.printHeader(MainMenuOption.MAKE_RESERVATION.getMessage());
 
+        String guestEmail = view.getGuestEmail();
+        Guest guest = guestService.getGuestByEmail(guestEmail);
+
+        String hostEmail = view.getHostEmail();
+        Host host = hostService.getHostByEmail(hostEmail);
+
+        List<Reservation> reservations = reservationService.findByHost(host);
+        view.printReservations(host, reservations, guestService);
+
+        Reservation reservation = view.makeReservation(host, guest);
+
+        Boolean confirm = view.confirmSummary(reservation);
+            if (!confirm) {
+                runMenu();
+            } else {
+                Result<Reservation> result = reservationService.add(host, reservation);
+                if (!result.isSuccess()) {
+                    view.displayStatus(false, result.getErrorMessages());
+                } else {
+                    String successMessage = String.format("Reservation %s created.", result.getPayload().getId());
+                    view.displayStatus(true, successMessage);
+                }
+            }
     }
-    private void deleteReservation() {
+
+    private void updateReservation() throws DataException {
+        view.printHeader(MainMenuOption.EDIT_RESERVATION.getMessage());
+
+        String guestEmail = view.getGuestEmail();
+        Guest guest = guestService.getGuestByEmail(guestEmail);
+
+        String hostEmail = view.getHostEmail();
+        Host host = hostService.getHostByEmail(hostEmail);
+
+        List<Reservation> reservations = reservationService.findByHost(host);
+
+        Reservation findReservations = view.chooseReservation(host, reservations, guest);
+
+        view.printHeader("Editing Reservation " + findReservations.getId());
+
+        Reservation reservation = view.update(host, findReservations);
+
+        Boolean confirm = view.confirmSummary(reservation);
+
+        if (!confirm) {
+            runMenu();
+        } else {
+            Result<Reservation> result = reservationService.update(host, reservation);
+            if (!result.isSuccess()) {
+                view.displayStatus(false, result.getErrorMessages());
+            } else {
+                String successMessage = String.format("Reservation %s updated.", result.getPayload().getId());
+                view.displayStatus(true, successMessage);
+            }
+        }
+    }
+    private void deleteReservation() throws DataException {
+        view.printHeader(MainMenuOption.CANCEL_RESERVATION.getMessage());
+
+        String guestEmail = view.getGuestEmail();
+        Guest guest = guestService.getGuestByEmail(guestEmail);
+
+        String hostEmail = view.getHostEmail();
+        Host host = hostService.getHostByEmail(hostEmail);
+
+        List<Reservation> reservations = reservationService.findByHost(host);
+
+        Reservation findReservations = view.chooseReservation(host, reservations, guest);
+
+        if (findReservations != null && reservationService.delete(host, findReservations).isSuccess()) {
+            view.displayStatus(true, "Reservation " + findReservations.getId() + " cancelled.");
+        } else {
+            view.displayStatus(false, "Reservations not found.");
+        }
 
     }
 }

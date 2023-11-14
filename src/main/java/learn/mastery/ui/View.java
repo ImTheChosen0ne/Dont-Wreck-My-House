@@ -7,6 +7,8 @@ import learn.mastery.models.Host;
 import learn.mastery.models.Reservation;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
@@ -16,11 +18,8 @@ import java.util.stream.Collectors;
 public class View {
     private final ConsoleIO io;
 
-    private final GuestService guestRepository;
-
-    public View(ConsoleIO io, GuestService guestRepository) {
+    public View(ConsoleIO io) {
         this.io = io;
-        this.guestRepository = guestRepository;
     }
 
     public MainMenuOption selectMainMenuOption() {
@@ -37,71 +36,81 @@ public class View {
         return MainMenuOption.fromValue(io.readInt(message, min, max));
     }
 
-    public void printReservations(Host host, List<Reservation> reservations) {
+    public void printReservations(Host host, List<Reservation> reservations, GuestService guestService) {
         printHeader(host.getLastName() + ": " + host.getCity() + ", " + host.getState());
 
         reservations.stream()
                 .sorted(Comparator.comparing(Reservation::getStart))
                 .forEach(reservation -> {
-                    Guest guest = guestRepository.getGuestById(reservation.getGuest().getId());
+                    Guest guest = guestService.getGuestById(reservation.getGuest().getId());
                     String guestInfo = "ID: " + reservation.getId() +
                             ", " + reservation.getStart() + " - " + reservation.getEnd() +
                             ", Guest: " + guest.getLastName() + ", " + guest.getFirstName() +
                             ", Email: " + guest.getEmail();
-                    System.out.println(guestInfo);
+                    io.println(guestInfo);
                 });
     }
 
-    public Reservation chooseReservation(Host host, List<Reservation> reservation) {
-//        displayItems(items);
-//
-//        if (items.size() == 0) {
-//            return null;
-//        }
-//
-//        int itemId = io.readInt("Select an item id: ");
-//        Item item = items.stream()
-//                .filter(i -> i.getId() == itemId)
-//                .findFirst()
-//                .orElse(null);
-//
-//        if (item == null) {
-//            displayStatus(false, String.format("No item with id %s found.", itemId));
-//        }
-//
-//        return item;
-        return null;
+    public Reservation chooseReservation(Host host, List<Reservation> reservations, Guest guest) {
+        printHeader(host.getLastName() + ": " + host.getCity() + ", " + host.getState());
+
+        if (reservations.size() == 0) {
+            return null;
+        }
+
+        List<Reservation> matchingReservations = reservations.stream()
+                .filter(reservation -> reservation.getGuest().getId() == guest.getId())
+                .sorted(Comparator.comparing(Reservation::getStart))
+                .collect(Collectors.toList());
+
+        matchingReservations.forEach(reservation -> {
+            String guestInfo = "ID: " + reservation.getId() +
+                    ", " + reservation.getStart() + " - " + reservation.getEnd() +
+                    ", Guest: " + guest.getLastName() + ", " + guest.getFirstName() +
+                    ", Email: " + guest.getEmail();
+            io.println(guestInfo);
+        });
+
+        int choice = io.readInt("Reservation ID: ");
+
+        return matchingReservations.stream()
+                .filter(reservation -> reservation.getId() == choice)
+                .findFirst()
+                .orElse(null);
     }
 
-    public Reservation makeReservation() {
-//        Forager forager = new Forager();
-//        forager.setFirstName(io.readRequiredString("Forager First Name: "));
-//        forager.setLastName(io.readRequiredString("Forager Last Name: "));
-//        forager.setState(io.readRequiredString("Forager State: "));
-//        return forager;
-        return null;
+    public Reservation makeReservation(Host host, Guest guest) {
+        Reservation reservation = new Reservation();
+
+        LocalDate start = io.readLocalDate("Start (MM/dd/yyyy): ");
+        LocalDate end = io.readLocalDate("End (MM/dd/yyyy): ");
+
+        reservation.setStart(start);
+        reservation.setEnd(end);
+        reservation.setHost(host);
+        reservation.setGuest(guest);
+
+        BigDecimal total = calculateTotal(host, start, end).setScale(2, BigDecimal.ROUND_HALF_UP);
+        reservation.setTotal(total);
+
+        return reservation;
     }
 
-    public Reservation update(Reservation reservation) {
-//        printHeader("Update");
-//
-//        String from = io.readString("From (" + m.getFrom() + "): ");
-//        // only update if it changed
-//        if (from.trim().length() > 0) {
-//            m.setFrom(from);
-//        }
-//
-//        String content = io.readString("Content (" + m.getContent() + "): ");
-//        if (content.trim().length() > 0) {
-//            m.setContent(content);
-//        }
-//
-//        String shareable = io.readString("Shareable (" + (m.isShareable() ? "y" : "n") + ") [y/n]: ");
-//        if (shareable.trim().length() > 0) {
-//            m.setShareable(shareable.equalsIgnoreCase("y"));
-//        }
-//        return m;
-        return null;
+    public Reservation update(Host host, Reservation reservation) {
+        LocalDate start = io.readLocalDate("Start (" + reservation.getStart() + "): ");
+
+        if (start != null) {
+            reservation.setStart(start);
+        }
+
+        LocalDate end = io.readLocalDate("End (" + reservation.getEnd() + "): ");
+        if (end != null) {
+            reservation.setEnd(end);
+        }
+
+        reservation.setHost(host);
+
+        return reservation;
     }
 
     public void printHeader(String message) {
@@ -122,13 +131,51 @@ public class View {
     }
 
     public boolean confirmSummary(Reservation reservation) {
-        return false;
+        System.out.println();
+        System.out.println("Start: " + reservation.getStart());
+        System.out.println("End: " + reservation.getEnd());
+        System.out.println("Total: $" + reservation.getTotal());
+        Boolean confirm = io.readBoolean("Is this okay? [y/n]: ");
+        if (confirm) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
+    public void displayStatus(boolean success, String message) {
+        displayStatus(success, List.of(message));
+    }
+
+    public void displayStatus(boolean success, List<String> messages) {
+        printHeader(success ? "Success" : "Error");
+        for (String message : messages) {
+            io.println(message);
+        }
+    }
     public String getHostEmail() {
         return io.readRequiredString("Host Email: ");
     }
 
+    public String getGuestEmail() {
+        return io.readRequiredString("Guest Email: ");
+    }
 
+    private BigDecimal calculateTotal(Host host, LocalDate start, LocalDate end) {
+        BigDecimal total = BigDecimal.ZERO;
+        LocalDate currentDate = start;
+
+        while (!currentDate.isAfter(end.minusDays(1))) {
+            BigDecimal dailyRate = isWeekendNight(currentDate) ? host.getWeekendRate() : host.getStandardRate();
+            total = total.add(dailyRate);
+            currentDate = currentDate.plusDays(1);
+        }
+
+        return total;
+    }
+
+    private boolean isWeekendNight(LocalDate date) {
+        return date.getDayOfWeek() == DayOfWeek.FRIDAY || date.getDayOfWeek() == DayOfWeek.SATURDAY;
+    }
 }
 

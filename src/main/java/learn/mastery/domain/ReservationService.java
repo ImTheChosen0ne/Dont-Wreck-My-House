@@ -40,7 +40,7 @@ public class ReservationService {
         for (Reservation r : reservations) {
             if (reservation.getStart().isBefore(r.getEnd()) &&
                     reservation.getEnd().isAfter(r.getStart())) {
-                System.out.println("Existing Found during chosen dates of: " + reservation.getStart() + "-" + reservation.getEnd());
+//                System.out.println("Existing Found during chosen dates of: " + reservation.getStart() + "-" + reservation.getEnd());
                 result.addErrorMessage("Existing Reservation");
                 return result;
             }
@@ -54,7 +54,6 @@ public class ReservationService {
 
     public Result update(Host host, Reservation reservation) throws DataException {
         Result result = validate(reservation);
-
 
         if (result.isSuccess()) {
             if (reservationRepository.update(host, reservation)) {
@@ -109,13 +108,13 @@ public class ReservationService {
         }
 
 //      The start date must come before the end date.
-        if (reservation.getStart().isBefore(reservation.getEnd())) {
+        if (reservation.getStart().isAfter(reservation.getEnd())) {
             result.addErrorMessage("Start date must be before end date.");
             return result;
         }
 
 //      The start date must be in the future.
-        if (reservation.getStart().isAfter(LocalDate.now())) {
+        if (reservation.getStart().isBefore(LocalDate.now())) {
             result.addErrorMessage("Start date must be in the future.");
             return result;
         }

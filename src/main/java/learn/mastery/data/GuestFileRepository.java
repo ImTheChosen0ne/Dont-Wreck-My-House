@@ -27,6 +27,14 @@ public class GuestFileRepository implements GuestRepository{
                 .orElse(null);
     }
 
+    @Override
+    public Guest getGuestByEmail(String guestEmail) {
+        return findAll().stream()
+                .filter(i -> i.getEmail().equalsIgnoreCase(guestEmail))
+                .findFirst()
+                .orElse(null);
+    }
+
     public List<Guest> findAll() {
         ArrayList<Guest> result = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
