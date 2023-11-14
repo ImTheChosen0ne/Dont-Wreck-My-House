@@ -144,7 +144,7 @@ public class View {
         io.println("Start: " + reservation.getStart());
         io.println("End: " + reservation.getEnd());
         io.println("Total: $" + reservation.getTotal());
-        Boolean confirm = io.readBoolean("Is this okay? [y/n]: ");
+        boolean confirm = io.readBoolean("Is this okay? [y/n]: ");
         if (confirm) {
             return true;
         } else {
