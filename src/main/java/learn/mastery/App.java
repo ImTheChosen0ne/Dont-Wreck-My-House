@@ -10,18 +10,13 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 @ComponentScan
 @PropertySource("classpath:data.properties")
 public class App {
-    public static void main(String[] args) throws DataException {
+    public static void main(String[] args) {
         configureWithAnnotationsAndRun();
     }
-    private static void configureWithAnnotationsAndRun() throws DataException {
+    private static void configureWithAnnotationsAndRun() {
         ApplicationContext container = new AnnotationConfigApplicationContext(App.class);
         Controller controller = container.getBean(Controller.class);
         controller.run();
     }
 
-    private static void configureWithXMLAndRun() {
-        ApplicationContext container = new ClassPathXmlApplicationContext("dependency-configuration.xml");
-        Controller controller = container.getBean(Controller.class);
-//        controller.run();
-    }
 }

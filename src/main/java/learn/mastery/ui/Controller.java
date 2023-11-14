@@ -27,9 +27,13 @@ public class Controller {
         this.guestService = guestService;
     }
 
-    public void run() throws DataException {
+    public void run() {
         view.printHeader("Don't Wreck My House");
+        try {
             runMenu();
+        } catch (DataException ex) {
+            view.displayException(ex);
+        }
         view.printHeader("Goodbye.");
     }
 
@@ -134,7 +138,7 @@ public class Controller {
         Reservation findReservations = view.chooseReservation(host, reservations, guest);
 
         if (findReservations != null && reservationService.delete(host, findReservations).isSuccess()) {
-            view.displayStatus(true, "Reservation " + findReservations.getId() + " cancelled.");
+            view.displayStatus(true, "Reservation " + findReservations.getId() + " canceled.");
         } else {
             view.displayStatus(false, "Reservations not found.");
         }

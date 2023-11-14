@@ -39,16 +39,22 @@ public class View {
     public void printReservations(Host host, List<Reservation> reservations, GuestService guestService) {
         printHeader(host.getLastName() + ": " + host.getCity() + ", " + host.getState());
 
-        reservations.stream()
+        List<Reservation> matchingReservations = reservations.stream()
                 .sorted(Comparator.comparing(Reservation::getStart))
-                .forEach(reservation -> {
-                    Guest guest = guestService.getGuestById(reservation.getGuest().getId());
-                    String guestInfo = "ID: " + reservation.getId() +
-                            ", " + reservation.getStart() + " - " + reservation.getEnd() +
-                            ", Guest: " + guest.getLastName() + ", " + guest.getFirstName() +
-                            ", Email: " + guest.getEmail();
-                    io.println(guestInfo);
-                });
+                .collect(Collectors.toList());
+
+        if (matchingReservations.size() == 0) {
+            io.println("No current reservations.");
+        } else {
+            matchingReservations.forEach(reservation -> {
+                Guest guest = guestService.getGuestById(reservation.getGuest().getId());
+                String guestInfo = "ID: " + reservation.getId() +
+                        ", " + reservation.getStart() + " - " + reservation.getEnd() +
+                        ", Guest: " + guest.getLastName() + ", " + guest.getFirstName() +
+                        ", Email: " + guest.getEmail();
+                io.println(guestInfo);
+            });
+        }
     }
 
     public Reservation chooseReservation(Host host, List<Reservation> reservations, Guest guest) {
@@ -108,6 +114,9 @@ public class View {
             reservation.setEnd(end);
         }
 
+        BigDecimal total = calculateTotal(host, start, end).setScale(2, BigDecimal.ROUND_HALF_UP);
+        reservation.setTotal(total);
+
         reservation.setHost(host);
 
         return reservation;
@@ -131,10 +140,10 @@ public class View {
     }
 
     public boolean confirmSummary(Reservation reservation) {
-        System.out.println();
-        System.out.println("Start: " + reservation.getStart());
-        System.out.println("End: " + reservation.getEnd());
-        System.out.println("Total: $" + reservation.getTotal());
+        printHeader("Summary");
+        io.println("Start: " + reservation.getStart());
+        io.println("End: " + reservation.getEnd());
+        io.println("Total: $" + reservation.getTotal());
         Boolean confirm = io.readBoolean("Is this okay? [y/n]: ");
         if (confirm) {
             return true;
@@ -159,6 +168,11 @@ public class View {
 
     public String getGuestEmail() {
         return io.readRequiredString("Guest Email: ");
+    }
+
+    public void displayException(Exception ex) {
+        printHeader("A critical error occurred:");
+        io.println(ex.getMessage());
     }
 
     private BigDecimal calculateTotal(Host host, LocalDate start, LocalDate end) {
