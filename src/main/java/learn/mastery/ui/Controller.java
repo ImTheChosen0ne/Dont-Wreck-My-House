@@ -131,7 +131,7 @@ public class Controller {
         if (findReservations != null && reservationService.delete(host, findReservations).isSuccess()) {
             view.displayStatus(true, "Reservation " + findReservations.getId() + " canceled.");
         } else {
-            view.displayStatus(false, "Reservations not found.");
+            System.out.println("Reservation does not exist.");
         }
     }
 

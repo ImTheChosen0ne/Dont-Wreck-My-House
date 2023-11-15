@@ -69,6 +69,10 @@ public class View {
                 .sorted(Comparator.comparing(Reservation::getStart))
                 .collect(Collectors.toList());
 
+        if (matchingReservations.size() == 0) {
+            return null;
+        }
+
         matchingReservations.forEach(reservation -> {
             String guestInfo = "ID: " + reservation.getId() +
                     ", " + reservation.getStart() + " - " + reservation.getEnd() +
@@ -126,17 +130,6 @@ public class View {
         io.println("");
         io.println(message);
         io.println("=".repeat(message.length()));
-    }
-
-    public void printResult(Result result) {
-        if (result.isSuccess()) {
-            printHeader("Success");
-        } else {
-            printHeader("Error");
-            for (String errorMessage : result.getErrorMessages()) {
-                System.out.println(errorMessage);
-            }
-        }
     }
 
     public boolean confirmSummary(Reservation reservation) {
