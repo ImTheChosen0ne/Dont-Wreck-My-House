@@ -59,8 +59,9 @@ public class Controller {
     }
     private void viewByHost() {
         view.printHeader(MainMenuOption.VIEW_RESERVATIONS.getMessage());
-        String hostEmail = view.getHostEmail();
-        Host host = hostService.getHostByEmail(hostEmail);
+
+        Host host = getHostByEmail();
+
         List<Reservation> reservations = reservationService.findByHost(host);
         view.printReservations(host, reservations, guestService);
     }
@@ -68,18 +69,15 @@ public class Controller {
     private void addReservation() throws DataException {
         view.printHeader(MainMenuOption.MAKE_RESERVATION.getMessage());
 
-        String guestEmail = view.getGuestEmail();
-        Guest guest = guestService.getGuestByEmail(guestEmail);
-
-        String hostEmail = view.getHostEmail();
-        Host host = hostService.getHostByEmail(hostEmail);
+        Guest guest = getGuestByEmail();
+        Host host = getHostByEmail();
 
         List<Reservation> reservations = reservationService.findByHost(host);
         view.printReservations(host, reservations, guestService);
 
         Reservation reservation = view.makeReservation(host, guest);
 
-        Boolean confirm = view.confirmSummary(reservation);
+        boolean confirm = view.confirmSummary(reservation);
             if (!confirm) {
                 runMenu();
             } else {
@@ -96,22 +94,17 @@ public class Controller {
     private void updateReservation() throws DataException {
         view.printHeader(MainMenuOption.EDIT_RESERVATION.getMessage());
 
-        String guestEmail = view.getGuestEmail();
-        Guest guest = guestService.getGuestByEmail(guestEmail);
-
-        String hostEmail = view.getHostEmail();
-        Host host = hostService.getHostByEmail(hostEmail);
+        Guest guest = getGuestByEmail();
+        Host host = getHostByEmail();
 
         List<Reservation> reservations = reservationService.findByHost(host);
 
         Reservation findReservations = view.chooseReservation(host, reservations, guest);
-
         view.printHeader("Editing Reservation " + findReservations.getId());
 
         Reservation reservation = view.update(host, findReservations);
 
         Boolean confirm = view.confirmSummary(reservation);
-
         if (!confirm) {
             runMenu();
         } else {
@@ -124,14 +117,12 @@ public class Controller {
             }
         }
     }
+
     private void deleteReservation() throws DataException {
         view.printHeader(MainMenuOption.CANCEL_RESERVATION.getMessage());
 
-        String guestEmail = view.getGuestEmail();
-        Guest guest = guestService.getGuestByEmail(guestEmail);
-
-        String hostEmail = view.getHostEmail();
-        Host host = hostService.getHostByEmail(hostEmail);
+        Guest guest = getGuestByEmail();
+        Host host = getHostByEmail();
 
         List<Reservation> reservations = reservationService.findByHost(host);
 
@@ -142,6 +133,31 @@ public class Controller {
         } else {
             view.displayStatus(false, "Reservations not found.");
         }
+    }
 
+    private Guest getGuestByEmail() {
+        String guestEmail = view.getGuestEmail();
+        Guest guest = guestService.getGuestByEmail(guestEmail);
+
+        if (guest == null) {
+            view.displayStatus(false, "Guest not found with the specified email.\nPlease re-enter a new guest email.");
+            System.out.println();
+            return getGuestByEmail();
+        }
+
+        return guest;
+    }
+
+    private Host getHostByEmail() {
+        String hostEmail = view.getHostEmail();
+        Host host = hostService.getHostByEmail(hostEmail);
+
+        if (host == null) {
+            view.displayStatus(false, "Host not found with the specified email.\nPlease re-enter a new host email.");
+            System.out.println();
+            return getHostByEmail();
+        }
+
+        return host;
     }
 }
