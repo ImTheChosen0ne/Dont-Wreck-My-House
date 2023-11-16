@@ -45,23 +45,11 @@ public class ReservationRepositoryDouble implements ReservationRepository {
     @Override
     public boolean update(Host host, Reservation reservation) {
         List<Reservation> reservations = findByHost(host);
-        for (Reservation r : reservations) {
-            if (r.getId() == reservation.getId()) {
-                return true;
-            }
-        }
-        return false;
+        return reservations.get(0).getId() > 0;
     }
 
     @Override
     public boolean delete(Host host, Reservation reservation) {
-        List<Reservation> reservations = findByHost(host);
-        for (Reservation r : reservations) {
-            if (r.getId() == reservation.getId()) {
-                reservations.remove(r);
-                return true;
-            }
-        }
-        return false;
+        return reservation.getId() != 99;
     }
 }

@@ -184,7 +184,6 @@ class ReservationServiceTest {
         assertEquals("Cannot update a past reservation.", result.getErrorMessages().get(1));
     }
 
-
     @Test
     void shouldDelete() throws DataException {
         Reservation reservation = service.findByHost(HOST).get(0);
