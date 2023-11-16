@@ -77,18 +77,30 @@ public class Controller {
 
         Reservation reservation = view.makeReservation(host, guest);
 
-        boolean confirm = view.confirmSummary(reservation);
+        Result<Reservation> result = reservationService.add(host, reservation);
+        if (!result.isSuccess()) {
+            view.displayStatus(false, result.getErrorMessages());
+        } else {
+            boolean confirm = view.confirmSummary(reservation);
             if (!confirm) {
                 runMenu();
             } else {
-                Result<Reservation> result = reservationService.add(host, reservation);
-                if (!result.isSuccess()) {
-                    view.displayStatus(false, result.getErrorMessages());
-                } else {
-                    String successMessage = String.format("Reservation %s created.", result.getPayload().getId());
-                    view.displayStatus(true, successMessage);
-                }
+                String successMessage = String.format("Reservation %s created.", result.getPayload().getId());
+                view.displayStatus(true, successMessage);
             }
+        }
+//        boolean confirm = view.confirmSummary(reservation);
+//            if (!confirm) {
+//                runMenu();
+//            } else {
+//                Result<Reservation> result = reservationService.add(host, reservation);
+//                if (!result.isSuccess()) {
+//                    view.displayStatus(false, result.getErrorMessages());
+//                } else {
+//                    String successMessage = String.format("Reservation %s created.", result.getPayload().getId());
+//                    view.displayStatus(true, successMessage);
+//                }
+//            }
     }
 
     private void updateReservation() throws DataException {
@@ -100,21 +112,37 @@ public class Controller {
         List<Reservation> reservations = reservationService.findByHost(host);
 
         Reservation findReservations = view.chooseReservation(host, reservations, guest);
-        view.printHeader("Editing Reservation " + findReservations.getId());
 
-        Reservation reservation = view.update(host, findReservations);
+        if (findReservations != null) {
+            view.printHeader("Editing Reservation " + findReservations.getId());
+            Reservation reservation = view.update(host, findReservations);
 
-        Boolean confirm = view.confirmSummary(reservation);
-        if (!confirm) {
-            runMenu();
-        } else {
             Result<Reservation> result = reservationService.update(host, reservation);
             if (!result.isSuccess()) {
                 view.displayStatus(false, result.getErrorMessages());
             } else {
-                String successMessage = String.format("Reservation %s updated.", result.getPayload().getId());
-                view.displayStatus(true, successMessage);
+                boolean confirm = view.confirmSummary(reservation);
+                if (!confirm) {
+                    runMenu();
+                } else {
+                    String successMessage = String.format("Reservation %s updated.", result.getPayload().getId());
+                    view.displayStatus(true, successMessage);
+                }
             }
+//            boolean confirm = view.confirmSummary(reservation);
+//            if (!confirm) {
+//                runMenu();
+//            } else {
+//                Result<Reservation> result = reservationService.update(host, reservation);
+//                if (!result.isSuccess()) {
+//                    view.displayStatus(false, result.getErrorMessages());
+//                } else {
+//                    String successMessage = String.format("Reservation %s updated.", result.getPayload().getId());
+//                    view.displayStatus(true, successMessage);
+//                }
+//            }
+        } else {
+            view.displayStatus(false, "Reservation does not exist.");
         }
     }
 
@@ -128,10 +156,17 @@ public class Controller {
 
         Reservation findReservations = view.chooseReservation(host, reservations, guest);
 
-        if (findReservations != null && reservationService.delete(host, findReservations).isSuccess()) {
-            view.displayStatus(true, "Reservation " + findReservations.getId() + " canceled.");
+//        Result result = reservationService.delete(host, findReservations);
+
+        if (findReservations != null) {
+            Result result = reservationService.delete(host, findReservations);
+            if (!result.isSuccess()) {
+                view.displayStatus(false, result.getErrorMessages());
+            } else {
+                view.displayStatus(true, "Reservation " + findReservations.getId() + " canceled.");
+            }
         } else {
-            System.out.println("Reservation does not exist.");
+            view.displayStatus(false, "Reservation does not exist.");
         }
     }
 

@@ -14,7 +14,7 @@ import java.util.List;
 public class HostFileRepository implements HostRepository{
     private String filePath;
 
-    public HostFileRepository(@Value("./data/hosts.csv")String filePath) {
+    public HostFileRepository(@Value("${hostFilePath}") String filePath) {
         this.filePath = filePath;
     }
 

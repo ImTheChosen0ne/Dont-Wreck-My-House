@@ -1,7 +1,6 @@
 package learn.mastery.ui;
 
 import learn.mastery.domain.GuestService;
-import learn.mastery.domain.Result;
 import learn.mastery.models.Guest;
 import learn.mastery.models.Host;
 import learn.mastery.models.Reservation;
@@ -10,6 +9,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,7 +32,7 @@ public class View {
             max = Math.max(max, option.getValue());
         }
 
-        String message = String.format("Select [%s-%s]: ", min, max - 1);
+        String message = String.format("Select [%s-%s]: ", min, max);
         return MainMenuOption.fromValue(io.readInt(message, min, max));
     }
 
@@ -49,7 +49,7 @@ public class View {
             matchingReservations.forEach(reservation -> {
                 Guest guest = guestService.getGuestById(reservation.getGuest().getId());
                 String guestInfo = "ID: " + reservation.getId() +
-                        ", " + reservation.getStart() + " - " + reservation.getEnd() +
+                        ", " + reservation.getStart().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"))  + " - " + reservation.getEnd().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"))  +
                         ", Guest: " + guest.getLastName() + ", " + guest.getFirstName() +
                         ", Email: " + guest.getEmail();
                 io.println(guestInfo);
@@ -75,7 +75,7 @@ public class View {
 
         matchingReservations.forEach(reservation -> {
             String guestInfo = "ID: " + reservation.getId() +
-                    ", " + reservation.getStart() + " - " + reservation.getEnd() +
+                    ", " + reservation.getStart().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"))  + " - " + reservation.getEnd().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"))  +
                     ", Guest: " + guest.getLastName() + ", " + guest.getFirstName() +
                     ", Email: " + guest.getEmail();
             io.println(guestInfo);
@@ -107,13 +107,14 @@ public class View {
     }
 
     public Reservation update(Host host, Reservation reservation) {
-        LocalDate start = io.readLocalDate("Start (" + reservation.getStart() + "): ");
+        LocalDate start = io.readLocalDateUpdate("Start (" + reservation.getStart().format(DateTimeFormatter.ofPattern("MM/dd/yyyy")) + "): ", reservation.getStart());
 
         if (start != null) {
             reservation.setStart(start);
         }
 
-        LocalDate end = io.readLocalDate("End (" + reservation.getEnd() + "): ");
+        LocalDate end = io.readLocalDateUpdate("End (" + reservation.getEnd().format(DateTimeFormatter.ofPattern("MM/dd/yyyy")) + "): ", reservation.getEnd());
+
         if (end != null) {
             reservation.setEnd(end);
         }
@@ -134,8 +135,8 @@ public class View {
 
     public boolean confirmSummary(Reservation reservation) {
         printHeader("Summary");
-        io.println("Start: " + reservation.getStart());
-        io.println("End: " + reservation.getEnd());
+        io.println("Start: " + reservation.getStart().format(DateTimeFormatter.ofPattern("MM/dd/yyyy")) );
+        io.println("End: " + reservation.getEnd().format(DateTimeFormatter.ofPattern("MM/dd/yyyy")) );
         io.println("Total: $" + reservation.getTotal());
         boolean confirm = io.readBoolean("Is this okay? [y/n]: ");
         if (confirm) {

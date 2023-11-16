@@ -66,7 +66,23 @@ public class ConsoleIO {
     }
     public LocalDate readLocalDate(String prompt) {
         while (true) {
-            String input = readRequiredString(prompt);
+            String input = readString(prompt);
+            try {
+                return LocalDate.parse(input, formatter);
+            } catch (DateTimeParseException ex) {
+                println("[INVALID] Enter a date in MM/dd/yyyy format.");
+            }
+        }
+    }
+
+    public LocalDate readLocalDateUpdate(String prompt, LocalDate date) {
+        while (true) {
+            String input = readString(prompt);
+
+            if (input.length() == 0) {
+                return date;
+            }
+
             try {
                 return LocalDate.parse(input, formatter);
             } catch (DateTimeParseException ex) {

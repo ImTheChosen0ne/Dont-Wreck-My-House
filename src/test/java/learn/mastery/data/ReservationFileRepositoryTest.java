@@ -37,11 +37,11 @@ class ReservationFileRepositoryTest {
     @Test
     void shouldAdd() throws DataException {
         Reservation reservation = new Reservation();
-        reservation.setStart(LocalDate.now());
-        reservation.setEnd(LocalDate.of(2023,12,3));
+        reservation.setStart(LocalDate.of(2023,12,1));
+        reservation.setEnd(LocalDate.of(2023,12,7));
 
         Guest guest = new Guest();
-        guest.setId(15);
+        guest.setId(1);
         reservation.setGuest(guest);
 
         reservation.setTotal(new BigDecimal(150));
@@ -55,10 +55,10 @@ class ReservationFileRepositoryTest {
     void shouldUpdate() throws DataException {
         Reservation reservation = new Reservation();
         reservation.setId(1);
-        reservation.setStart(LocalDate.of(2021,1,16));
-        reservation.setEnd(LocalDate.of(2022,1,23));
+        reservation.setStart(LocalDate.of(2023,12,2));
+        reservation.setEnd(LocalDate.of(2023,12,8));
         Guest guest = new Guest();
-        guest.setId(21);
+        guest.setId(1);
         reservation.setGuest(guest);
         reservation.setTotal(new BigDecimal(100));
 

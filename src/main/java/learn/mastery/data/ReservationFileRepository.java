@@ -21,7 +21,7 @@ public class ReservationFileRepository implements ReservationRepository {
     private String directoryPath;
     private static final String DELIMITER = ",";
 
-    public ReservationFileRepository(@Value("./data/reservations") String directoryPath) {
+    public ReservationFileRepository(@Value("${reservationFilePath}") String directoryPath) {
         this.directoryPath = directoryPath;
     }
 

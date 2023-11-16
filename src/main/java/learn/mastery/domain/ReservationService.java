@@ -10,8 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 public class ReservationService {
@@ -35,12 +33,11 @@ public class ReservationService {
                 return result;
         }
 
-//      The reservation may never overlap existing reservation dates.
+    // The reservation may never overlap existing reservation dates.
         List<Reservation> reservations = reservationRepository.findByHost(host);
         for (Reservation r : reservations) {
             if (reservation.getStart().isBefore(r.getEnd()) &&
                     reservation.getEnd().isAfter(r.getStart())) {
-//                System.out.println("Existing Found during chosen dates of: " + reservation.getStart() + "-" + reservation.getEnd());
                 result.addErrorMessage("Existing Reservation");
                 return result;
             }
@@ -55,6 +52,10 @@ public class ReservationService {
     public Result update(Host host, Reservation reservation) throws DataException {
         Result result = validate(reservation);
 
+        if (reservation.getStart().isBefore(LocalDate.now()) || reservation.getEnd().isBefore(LocalDate.now())) {
+            result.addErrorMessage("Cannot update a past reservation.");
+        }
+
         if (result.isSuccess()) {
             if (reservationRepository.update(host, reservation)) {
                 result.setPayload(reservation);
@@ -66,17 +67,17 @@ public class ReservationService {
     }
     public Result delete(Host host, Reservation reservation) throws DataException {
         Result result = new Result();
-        if (!reservationRepository.delete(host, reservation)) {
-            result.addErrorMessage("Reservation was not found.");
-        } else if (reservation.getStart().isBefore(LocalDate.now()) || reservation.getEnd().isBefore(LocalDate.now())) {
+        if (reservation.getStart().isBefore(LocalDate.now()) || reservation.getEnd().isBefore(LocalDate.now())) {
             result.addErrorMessage("Cannot cancel a reservation in the past.");
+        } else if (!reservationRepository.delete(host, reservation)) {
+            result.addErrorMessage("Reservation was not found.");
         }
         return result;
     }
     private Result validate(Reservation reservation) {
         Result<Reservation> result = new Result<>();
 
-//      Guest, host, and start and end dates are required.
+    // Guest, host, and start and end dates are required.
         if (reservation.getGuest() == null) {
             result.addErrorMessage("Guest is required.");
             return result;
@@ -97,7 +98,7 @@ public class ReservationService {
             return result;
         }
 
-//      The guest and host must already exist in the "database". Guests and hosts cannot be created.
+        // The guest and host must already exist in the "database". Guests and hosts cannot be created.
         if (reservation.getHost().getId() == null
                 || hostRepository.getHostByEmail(reservation.getHost().getEmail()) == null) {
             result.addErrorMessage("Host does not exist.");
@@ -107,17 +108,24 @@ public class ReservationService {
             result.addErrorMessage("Guest does not exist.");
         }
 
-//      The start date must come before the end date.
+        // The start date must come before the end date.
         if (reservation.getStart().isAfter(reservation.getEnd())) {
             result.addErrorMessage("Start date must be before end date.");
             return result;
         }
 
-//      The start date must be in the future.
+        // The start date must be in the future.
         if (reservation.getStart().isBefore(LocalDate.now())) {
             result.addErrorMessage("Start date must be in the future.");
             return result;
         }
+
+        // Reservation Start and end cannot be on same day
+        if (reservation.getStart().isEqual(reservation.getEnd())) {
+            result.addErrorMessage("Cannot have Start Date and End date on same day.");
+            return result;
+        }
+
         return result;
     }
 }

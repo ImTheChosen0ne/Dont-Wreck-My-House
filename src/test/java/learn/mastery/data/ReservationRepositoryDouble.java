@@ -10,12 +10,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ReservationRepositoryDouble implements ReservationRepository{
+public class ReservationRepositoryDouble implements ReservationRepository {
     final static Guest guest = new Guest(1,"Sullivan","Lomas","slomas0@mediafire.com","(702) 7768761","NV");
 
     final static Host host = new Host("9d469342-ad0b-4f5a-8d28-e81e690ba29a","Wigfield","kwigfieldiy@php.net","(305) 8769397","88875 Miller Parkway","Miami","FL",33185,new BigDecimal(435),new BigDecimal(543.75));
 
-    public final static Reservation RESERVATION = new Reservation(1, LocalDate.of(2023,12,7), LocalDate.of(2023,12,1), host, guest, new BigDecimal(1000));
+    public final static Reservation RESERVATION = new Reservation(1, LocalDate.of(2023,12,1), LocalDate.of(2023,12,7), host, guest, new BigDecimal(1000));
 
     private final ArrayList<Reservation> reservations = new ArrayList<>();
 

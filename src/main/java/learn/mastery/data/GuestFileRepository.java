@@ -15,7 +15,7 @@ import java.util.List;
 public class GuestFileRepository implements GuestRepository{
     private String filePath;
 
-    public GuestFileRepository(@Value("./data/guests.csv")String filePath) {
+    public GuestFileRepository(@Value("${guestFilePath}") String filePath) {
         this.filePath = filePath;
     }
 
