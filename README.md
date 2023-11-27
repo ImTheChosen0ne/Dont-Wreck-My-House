@@ -16,10 +16,10 @@ Don't Wreck My House was written by a Matthew Almeida as a Mastery project durin
 A guest chooses a place to stay for a specific date range. If the host location is available, it may be reserved by the guest. Reserved locations are not available to other guests during reserved dates.
 
 The application user is an accommodation administrator. They pair guests to hosts to make reservations.
-    * The administrator may view existing reservations for a host.
-    * The administrator may create a reservation for a guest with a host.
-    * The administrator may edit existing reservations.
-    * The administrator may cancel a future reservation.
+   * The administrator may view existing reservations for a host.
+   * The administrator may create a reservation for a guest with a host.
+   * The administrator may edit existing reservations.
+   * The administrator may cancel a future reservation.
 
 ## Author
 * Matthew Almeida
